@@ -12,6 +12,10 @@ This project, developed in **R**, aims to analyze SARS-CoV-2 sequences reported 
 - **Phylogenetic tree**: A phylogenetic tree was constructed to visualize the evolutionary relationship between virus variants in different countries.
 - **Graph interpretation**: Graphs were generated to visually interpret the results of the sequence analysis and evaluate differences in mutation load.
 
+### Graphical Analysis
+![Graphs](https://github.com/Roodrrigoo/R-proyect-SarsCov2/blob/main/imgs/graficas%20corona.png?raw=true)
+
+
 ## Purpose of the Project:
 The comparative analysis of SARS-CoV-2 sequences between countries provides crucial information on the spread of the virus, its evolution, and the impact of genetic and environmental factors. This approach helps identify variants of concern and contributes to the development of improved diagnostics, treatments, and vaccines.
 
@@ -22,6 +26,3 @@ The comparative analysis of SARS-CoV-2 sequences between countries provides cruc
 ## Visualizations:
 ### Phylogenetic Tree of Virus Variants
 ![Phylogenetic Tree](https://github.com/Roodrrigoo/R-proyect-SarsCov2/blob/main/imgs/variantes%20corona.png?raw=true)
-
-### Graphical Analysis
-![Graphs](https://github.com/Roodrrigoo/R-proyect-SarsCov2/blob/main/imgs/graficas%20corona.png?raw=true)
