@@ -1,0 +1,429 @@
+---
+title: "Evidencia 2"
+author: "Rodrigo Fernando Rivera Olea"
+date: "3/5/2023"
+output: html_document
+---
+Link video: https://youtu.be/vi7vLikAEqA
+
+Analizar las secuencias de SARS-CoV-2 reportadas en los 20 países con más casos reportados. Y puedes tratar de responder a la pregunta: ¿Son muy diferentes las variantes entre cada país? ¿Es diferente el SARS-CoV-2 entre las diferentes poblaciones: Asiática, Hispana, Europea o Africana?
+
+
+20 paises con mas casos reportados de Coronavirus [1]
+
+1 OQ881097 Estados Unidos 
+
+2 OQ872223 India 
+
+3 OQ888846 Francia 
+
+4 OX464022 Alemania
+
+5 OQ852746 Brasil 
+
+6 OQ804210  Japon 
+
+7 OP763667 Korea
+
+8 OQ748861 Italia 
+
+9 OX465604 Reino Unido 
+
+10 OQ718959 Rusia 
+
+11 OQ608097 Turquia
+
+12 OK641588 España 
+
+13 OQ592578 Vietnam 
+
+14 OQ692122 Australia 
+
+15 OQ194009 Taiwan
+
+16 OQ690452 Argentina 
+
+17 OM304632 Paises bajos 
+
+18 OQ421547 Iran 
+
+19 OQ690571  Mexico
+
+20 ON564872 Indonesia 
+
+
+
+
+#Introduccion:
+
+El SARS-CoV-2 es un virus altamente contagioso que causa la enfermedad COVID-19 y ha afectado a millones de personas en todo el mundo. Desde su aparición en Wuhan, China, a finales de 2019, se ha propagado a nivel mundial, convirtiéndose en una pandemia que ha tenido un impacto significativo en la salud pública, la economía y la vida cotidiana.
+
+Una de las herramientas más importantes para combatir la propagación del virus es el conocimiento de su secuencia genética. Las secuencias del virus en diferentes países son cruciales para comprender la diversidad genética del virus, su evolución y las posibles mutaciones. También pueden ayudar a los científicos a desarrollar mejores diagnósticos, tratamientos y vacunas.
+
+La comparación de las secuencias del virus en diferentes países puede proporcionar información valiosa sobre cómo se está propagando la enfermedad y cómo se puede prevenir su transmisión. Por ejemplo, en un estudio reciente que comparó las secuencias del virus en diferentes países, se identificaron diferencias significativas en la carga de mutaciones del virus en diferentes regiones geográficas, lo que sugiere que la propagación del virus está influenciada por factores genéticos y ambientales [2].
+
+Además, el intercambio de datos genómicos es crucial para la colaboración internacional y la toma de decisiones informadas en la lucha contra la pandemia. Por lo tanto, la colaboración internacional y el intercambio de datos genómicos son fundamentales para abordar la pandemia de manera efectiva y proteger la salud pública global [3].
+
+Referencias:
+
+1 Coronavirus: número de casos confirmados por país en 2023 | Statista. (2023, 28 abril). Statista. https://es.statista.com/estadisticas/1091192/paises-afectados-por-el-coronavirus-de-wuhan-segun-los-casos-confirmados/
+
+2 Grubaugh et al. Genomic epidemiology of the COVID-19 pandemic. Nature Reviews Microbiology, 2021.
+
+3 Hadfield et al. Nextstrain: real-time tracking of pathogen evolution. Bioinformatics, 2018.
+
+
+```{r}
+suppressPackageStartupMessages(library(Biostrings))
+suppressPackageStartupMessages(library(seqinr))
+suppressPackageStartupMessages(library(adegenet))
+suppressPackageStartupMessages(library(ape))
+suppressPackageStartupMessages(library(ggtree))
+suppressPackageStartupMessages(library(DECIPHER))
+suppressPackageStartupMessages(library(viridis))
+suppressPackageStartupMessages(library(ggplot2))
+
+```
+
+
+
+```{r}
+Viruspaises<-c(  "OQ881097", "OQ872223", "OQ888846", "OX464022", "OQ852746", "OQ804210","OP763667","OQ748861", "OX465604",
+               "OQ718959", "OQ608097", "OK641588", "OQ592578","OQ692122","OQ194009", "OQ690452", "OM304632", "OQ421547", "OQ690571", "ON564872")
+
+Viruspaises_sequences <- read.GenBank(Viruspaises)
+
+str(Viruspaises_sequences)
+
+
+suppressPackageStartupMessages(attributes(Viruspaises_sequences))
+suppressPackageStartupMessages(names(Viruspaises_sequences))
+suppressPackageStartupMessages(attr(Viruspaises_sequences, "Virus"))
+
+suppressPackageStartupMessages(write.dna(Viruspaises_sequences,  file ="virus_seqs.fasta", format = "fasta", append =
+FALSE, nbcol = 6, colsep = " ", colw = 10))
+
+
+suppressPackageStartupMessages(virus_seq_not_align <- readDNAStringSet("virus_seqs.fasta", format = "fasta"))
+
+suppressPackageStartupMessages(virus_seq_not_align <- OrientNucleotides(virus_seq_not_align))
+
+suppressPackageStartupMessages(virus_seq_align<- AlignSeqs(virus_seq_not_align))
+
+
+BrowseSeqs(virus_seq_align, highlight=0)
+
+
+writeXStringSet(virus_seq_align, file="virus_seq_align.fasta")
+
+
+virus_aligned <- read.alignment("virus_seq_align.fasta", format = "fasta")
+
+matriz_distancia <- dist.alignment(virus_aligned, matrix = "similarity")
+
+
+virus_tree <- nj(matriz_distancia)
+class(virus_tree) 
+
+virus_tree <- ladderize(virus_tree)
+
+plot(virus_tree, cex = 0.9)
+
+title("Variantes de Coronavirus ")
+
+
+
+```
+
+Analisis e interpretacion de graficas 
+
+En un árbol filogenético, cada rama representa una variante, y los nodos representan el punto de divergencia entre estos. Los nodos más cercanos al tronco del árbol representan una mayor similitud mientras que los mas alejados son aquellos que son mas distintos
+
+Para construir nuestro  árbol filogenético, se utilizo información genética de los virus . Se compararon las secuencias de estos elementos y se buscaron similitudes y diferencias en las secuencias. Cuanto más similares son las secuencias, más cercanamente relacionados están los virus.
+
+
+
+```{r}
+EstadosUnidos<-read.GenBank("OQ881097")
+EstadosUnidos1<-read.fasta("EstadosUnidos.fasta")
+
+
+India<-read.GenBank("OQ872223")
+India1<-read.fasta("Indonesia.fasta")
+
+
+
+Francia<-read.GenBank("OQ888846")
+Francia1<-read.fasta("Francia.fasta")
+
+
+Alemania<-read.GenBank("OX464022")
+Alemania1<-read.fasta("Alemania.fasta")
+
+
+Brasil<-read.GenBank("OQ852746")
+Brasil1<-read.fasta("Brasil.fasta")
+
+
+Japon<-read.GenBank("OQ804210")
+Japon1<-read.fasta("Japon.fasta")
+
+
+Korea<-read.GenBank("OP763667")
+Korea1<-read.fasta("Korea.fasta")
+
+Italia<-read.GenBank("OQ748861")
+Italia1<-read.fasta("Italia.fasta")
+
+ReinoUnido<-read.GenBank("OX465604")
+ReinoUnido1<-read.fasta("ReinoUnido.fasta")
+
+Rusia<-read.GenBank("OQ718959")
+Rusia1<-read.fasta("Rusia.fasta")
+
+Turquia<-read.GenBank("OQ608097")
+Turquia1<-read.fasta("Turquia.fasta")
+
+España<-read.GenBank("OK641588")
+España1<-read.fasta("España.fasta")
+
+Vietnam<-read.GenBank("OQ592578")
+Vietnam1<-read.fasta("Vietnam.fasta")
+
+Australia<-read.GenBank("OQ692122")
+Australia1<-read.fasta("Australia.fasta")
+
+Taiwan<-read.GenBank("OQ194009")
+Taiwan1<-read.fasta("Taiwan.fasta")
+
+Argentina<-read.GenBank("OQ690452")
+Argentina1<-read.fasta("Argentina.fasta")
+
+Paisesbajos<-read.GenBank("OM304632")
+Paisesbajos1<-read.fasta("Paisesbajos.fasta")
+
+Iran<-read.GenBank("OQ421547")
+Iran1<-read.fasta("Iran.fasta")
+
+Mexico<-read.GenBank("OQ690571")
+Mexico1<-read.fasta("Mexico.fasta")
+
+Indonesia<-read.GenBank("ON564872")
+Indonesia1<-read.fasta("Indonesia.fasta")
+```
+
+Calcula la longitud de las secuencias que incluyas.
+```{r}
+length(EstadosUnidos[[1]])
+```
+
+
+```{r}
+length(India[[1]])
+```
+
+
+```{r}
+length(Francia[[1]])
+```
+
+
+```{r}
+length(Alemania[[1]])
+```
+
+
+```{r}
+length(Brasil[[1]])
+```
+
+
+```{r}
+length(Japon[[1]])
+```
+
+
+```{r}
+length(Korea[[1]])
+```
+
+
+```{r}
+length(Italia[[1]])
+```
+
+
+```{r}
+length(ReinoUnido[[1]])
+```
+
+
+```{r}
+length(Rusia[[1]])
+```
+
+
+```{r}
+length(Turquia[[1]])
+```
+
+
+```{r}
+length(España[[1]])
+```
+
+
+```{r}
+length(Vietnam[[1]])
+```
+
+
+```{r}
+length(Australia[[1]])
+```
+
+
+```{r}
+length(Taiwan[[1]])
+```
+
+
+```{r}
+length(Argentina[[1]])
+```
+
+
+```{r}
+length(Paisesbajos[[1]])
+```
+
+
+```{r}
+length(Iran[[1]])
+```
+
+
+```{r}
+length(Mexico[[1]])
+```
+
+
+```{r}
+length(Indonesia[[1]])
+```
+
+
+```{r}
+```
+
+Crea una sola gráfica donde se comparen el número de bases de ADN que componen todas las variantes del virus. 
+
+```{r}
+EstadosUnidos_compos<-count(EstadosUnidos1[[1]],1)
+
+India_compos<-count(India1[1],1)
+
+
+Francia_compos<-count(Francia1[[1]],1)
+
+
+Alemania_compos<-count(Alemania1[[1]],1)
+
+
+Brasil_compos<-count(Brasil1[[1]],1)
+
+
+Japon_compos<-count(Japon1[[1]],1)
+
+
+Korea_compos<-count(Korea1[[1]],1)
+
+
+Italia_compos<-count(Italia1[[1]],1)
+
+
+ReinoUnido_compos<-count(ReinoUnido1[[1]],1)
+
+
+Rusia_compos<-count(Rusia1[[1]],1)
+
+
+Turquia_compos<-count(Turquia1[[1]],1)
+
+
+España_compos<-count(España1[[1]],1)
+
+
+Vietnam_compos<-count(Vietnam1[[1]],1)
+
+
+Australia_compos<-count(Australia1[[1]],1)
+
+
+Taiwan_compos<-count(Taiwan1[[1]],1)
+
+
+Paisesbajos_compos<-count(Paisesbajos1[[1]],1)
+
+
+Argentina_compos<-count(Argentina1[[1]],1)
+
+
+Iran_compos<-count(Iran1[[1]],1)
+
+Mexico_compos<-count(Mexico1[[1]],1)
+
+Indonesia_compos<-count(Indonesia1[[1]],1)
+
+
+
+
+
+tabla <- data.frame(
+  Virus = rep(c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15","16", "17", "18", "19", "20"), each = 4), 
+  Nucleotido = rep(c("Adenina", "Citosina", "Guanina", "Timina"),5), 
+  Frecuencia = c(EstadosUnidos_compos, India_compos, Francia_compos, Alemania_compos,Brasil_compos,Japon_compos,Korea_compos,Italia_compos,ReinoUnido_compos,Rusia_compos,Turquia_compos,España_compos,Vietnam_compos,Australia_compos,Taiwan_compos,Paisesbajos_compos,Argentina_compos,Iran_compos,Mexico_compos,Indonesia_compos)
+  )
+
+ggplot(data = tabla) +
+  geom_bar(aes(x=Virus, y=Frecuencia, fill=Nucleotido), position = "dodge", stat = "identity")
+
+```
+
+#Analis de graficas
+
+En la grafica podemos apreciar como estas tienen una composicion similar de adenina citosina guanina y timina sin embargo existen algunas variantes que tienen una composicion menor de estos elementos sin embargo comparten un patron en su distribucion estos son los coronavirus de Indonesia Iran Rusia y Turquia las variantes de cada pais no llegan a tener una diferencia significativa sin embargo llegan a presentar variaciones estas pudiendo afectar su transmisibilidad, virulencia y respuesta a las vacunas y tratamientos.
+
+Es importante destacar que estas diferencias no son necesariamente específicas de una población en particular, sino que pueden ser el resultado de la evolución del virus y la propagación global del mismo.
+
+
+#Conclusiones 
+
+En conclusión, el uso de herramientas computacionales para analizar virus, como el SARS-CoV-2, es de vital  importancia en la lucha contra la pandemia. La construcción de árboles filogenéticos de las distintas variantes del virus en diferentes países proporciona información valiosa sobre la propagación y evolución del virus, y ayuda a los investigadores a entender cómo se está transmitiendo y cómo pueden prevenir su propagación.
+
+Estas herramientas permiten identificar patrones en la propagación del virus.Esto a su vez ayuda a los científicos a desarrollar mejores diagnósticos, tratamientos y vacunas.
+
+La construcción de árboles filogenéticos ayuda a identificar variantes preocupantes y proporciona información esencial para el monitoreo y control de la pandemia.
+
+
+
+
+#Bibliografia Codigo y Video:
+
+1 Coronavirus: número de casos confirmados por país en 2023 | Statista. (2023, 28 abril). Statista. https://es.statista.com/estadisticas/1091192/paises-afectados-por-el-coronavirus-de-wuhan-segun-los-casos-confirmados/
+
+2 Grubaugh et al. Genomic epidemiology of the COVID-19 pandemic. Nature Reviews Microbiology, 2021.
+
+3 Hadfield et al. Nextstrain: real-time tracking of pathogen evolution. Bioinformatics, 2018.
+
+4 Dk, L., & Alkhovsky, S. V. (2020). Source of the COVID-19 pandemic: ecology and genetics of coronaviruses (Betacoronavirus: Coronaviridae) SARS-CoV, SARS-CoV-2 (subgenus Sarbecovirus), and MERS-CoV (subgenus Merbecovirus). Voprosy virusologii, 65(2), 62-70. https://doi.org/10.36233/0507-4088-2020-65-2-62-70
+
+5 Fung, T. S., & Liu, D. (2021). Similarities and Dissimilarities of COVID-19 and Other Coronavirus Diseases. Annual Review of Microbiology, 75(1), 19-47. https://doi.org/10.1146/annurev-micro-110520-023212
+
+6 Cruz, M. P., Santos, E. M., Cervantes, M. V., & Juárez, M. (2021). COVID-19, una emergencia de salud pública mundial. Revista Clinica Espanola, 221(1), 55-61. https://doi.org/10.1016/j.rce.2020.03.001
+
+
+
+
+
+
